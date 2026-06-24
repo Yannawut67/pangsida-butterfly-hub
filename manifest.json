@@ -1,0 +1,27 @@
+{
+  "name": "Pang Sida Butterfly Hub",
+  "short_name": "Butterfly Hub",
+  "description": "ระบบวิเคราะห์และบันทึกสปีชีส์ผีเสื้ออุทยานแห่งชาติปางสีดา — AI Scanner + ทะเบียน",
+  "start_url": "/pangsida-butterfly-hub/",
+  "display": "standalone",
+  "background_color": "#0a1628",
+  "theme_color": "#00e676",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/pangsida-butterfly-hub/resources/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/pangsida-butterfly-hub/resources/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["education", "productivity", "utilities"],
+  "lang": "th",
+  "dir": "ltr"
+}

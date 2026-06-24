@@ -9,8 +9,18 @@
   <meta name="description" content="ระบบวิเคราะห์และบันทึกสปีชีส์ผีเสื้อประจำอุทยานแห่งชาติปางสีดา สแกนรูปภาพด้วย AI เพื่อจัดกลุ่ม จำแนกสายพันธุ์ และส่งรายงานข้อมูลสายพันธุ์ใหม่ขึ้น Google Sheets ทันที">
   <meta name="keywords" content="ผีเสื้อ, ปางสีดา, อุทยานแห่งชาติปางสีดา, จำแนกผีเสื้อ AI, ทะเบียนผีเสื้อ, Google Sheets, สระแก้ว">
   <meta name="author" content="Pang Sida Conservation Team">
+
+  <!-- PWA / Mobile App -->
+  <meta name="theme-color" content="#0a1628">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Butterfly Hub">
+  <link rel="apple-touch-icon" href="/pangsida-butterfly-hub/resources/icons/icon-192.png">
+  <link rel="apple-touch-icon" sizes="512x512" href="/pangsida-butterfly-hub/resources/icons/icon-512.png">
+  <link rel="manifest" href="/pangsida-butterfly-hub/manifest.json">
+
   
-  <!-- Stylesheets -->
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -348,5 +358,13 @@
 
   <!-- Javascript Logic -->
   <script src="app.js"></script>
+  <!-- PWA Service Worker — enables offline + install -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/pangsida-butterfly-hub/sw.js')
+        .then(reg => console.log('[PWA] Service Worker registered:', reg.scope))
+        .catch(err => console.warn('[PWA] SW registration failed:', err));
+    }
+  </script>
 </body>
 </html>
