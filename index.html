@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pang Sida Butterfly Hub - ระบบจำแนกและทะเบียนผีเสื้ออุทยานแห่งชาติปางสีดา</title>
+  
+  <!-- SEO Meta Tags -->
+  <meta name="description" content="ระบบวิเคราะห์และบันทึกสปีชีส์ผีเสื้อประจำอุทยานแห่งชาติปางสีดา สแกนรูปภาพด้วย AI เพื่อจัดกลุ่ม จำแนกสายพันธุ์ และส่งรายงานข้อมูลสายพันธุ์ใหม่ขึ้น Google Sheets ทันที">
+  <meta name="keywords" content="ผีเสื้อ, ปางสีดา, อุทยานแห่งชาติปางสีดา, จำแนกผีเสื้อ AI, ทะเบียนผีเสื้อ, Google Sheets, สระแก้ว">
+  <meta name="author" content="Pang Sida Conservation Team">
+  
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Header Navigation -->
+  <header>
+    <div class="logo-container">
+      <img src="resources/images/pang_sida_logo.png" alt="Pang Sida National Park Logo" style="width: 42px; height: 42px; border-radius: 50%; object-fit: cover; box-shadow: 0 0 12px rgba(0, 230, 118, 0.4); border: 1px solid var(--accent-green);">
+      <div class="logo-text">
+        <h1>Pang Sida Butterfly Hub</h1>
+        <p>ศูนย์ทะเบียนและระบบวิเคราะห์ผีเสื้อด้วย AI</p>
+      </div>
+    </div>
+    
+    <nav class="nav-links">
+      <button class="nav-btn active" data-tab="dashboard" id="navDashboardBtn">
+        📊 แดชบอร์ด
+      </button>
+      <button class="nav-btn" data-tab="scanner" id="navScannerBtn">
+        🔍 สแกนเนอร์ AI
+      </button>
+      <button class="nav-btn" data-tab="directory" id="navCatalogBtn">
+        🦋 คลังทะเบียนสปีชีส์
+      </button>
+    </nav>
+
+    <button class="settings-trigger" onclick="openSettingsModal()" title="ตั้งค่าการเชื่อมต่อ Google Sheets" id="settingsBtn">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+      </svg>
+    </button>
+  </header>
+
+  <!-- Main Content Container -->
+  <main class="dashboard-container">
+    
+    <!-- Top Stats Bar -->
+    <section class="overview-stats">
+      <div class="stat-card green">
+        <div class="stat-info">
+          <h3>ชนิดที่บันทึกแล้ว</h3>
+          <div class="stat-value" id="totalSpeciesCount">0</div>
+          <div class="stat-desc">สปีชีส์ในทะเบียนปางสีดา</div>
+        </div>
+        <div class="stat-icon-wrapper">
+          🦋
+        </div>
+      </div>
+
+      <div class="stat-card gold">
+        <div class="stat-info">
+          <h3>ตรวจด้วย AI</h3>
+          <div class="stat-value" id="aiVerifiedCount">0</div>
+          <div class="stat-desc">วิเคราะห์สแกนรูปภาพสำเร็จ</div>
+        </div>
+        <div class="stat-icon-wrapper">
+          🤖
+        </div>
+      </div>
+
+      <div class="stat-card blue">
+        <div class="stat-info">
+          <h3>วงศ์ผีเสื้อ</h3>
+          <div class="stat-value" id="familiesCount">0</div>
+          <div class="stat-desc">ความหลากหลายทางชีวภาพ</div>
+        </div>
+        <div class="stat-icon-wrapper">
+          🧬
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-info">
+          <h3>สถานะระบบ</h3>
+          <div style="display: flex; align-items: center; margin-top: 0.5rem;">
+            <span class="status-dot" id="aiStatusIndicator"></span>
+            <span id="aiStatusText" style="font-weight: 700; font-size: 0.9rem;">AI: ออฟไลน์</span>
+          </div>
+          <div style="display: flex; align-items: center; margin-top: 0.3rem;">
+            <span class="status-dot" id="sheetsStatusIndicator"></span>
+            <span id="sheetsStatusText" style="font-weight: 700; font-size: 0.9rem;">Sheets: ออฟไลน์</span>
+          </div>
+        </div>
+        <div class="stat-icon-wrapper">
+          🔌
+        </div>
+      </div>
+    </section>
+
+    <!-- Core Layout Layout Grid -->
+    <div class="main-grid">
+      
+      <!-- Left Panel: AI Scanner -->
+      <section class="glass-card scanner-panel" id="scannerWidget">
+        <h2 class="card-title">
+          <span style="display:inline-block; width:10px; height:10px; border-radius:50%; background:var(--accent-green); box-shadow: 0 0 10px var(--accent-green);"></span>
+          วิเคราะห์สายพันธุ์ด้วย AI
+        </h2>
+        <p class="card-subtitle">อัปโหลดภาพผีเสื้อเพื่อจำแนกชนิดในพริบตา</p>
+        
+        <div class="scanner-widget">
+          <!-- Dropzone -->
+          <div class="dropzone-container" id="dropzone" title="ลากรูปภาพมาวางหรือคลิกเพื่อเลือกไฟล์">
+            <div class="dropzone-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+              </svg>
+            </div>
+            <h3>ลากไฟล์ภาพมาที่นี่ หรือคลิกเพื่ออัปโหลด</h3>
+            <p>รองรับไฟล์ JPG, PNG (ระบบจะวิเคราะห์ลักษณะปีกโดยอัตโนมัติ)</p>
+          </div>
+          <input type="file" id="fileInput" class="file-input" accept="image/*">
+          
+          <button class="scan-btn" id="startScanBtn" onclick="startAIScan()" disabled>
+            🔍 เริ่มการสแกนด้วย AI
+          </button>
+
+          <!-- Scan Results Block -->
+          <div class="scan-results" id="scanResults">
+            <!-- Dynamically populated via JS -->
+          </div>
+        </div>
+      </section>
+
+      <!-- Right Panel: Dynamic Content (Dashboard info / Species list) -->
+      <div style="display: flex; flex-direction: column; gap: 2rem;">
+        
+        <!-- Dashboard Statistics Section -->
+        <section class="glass-card" id="dashboardTab">
+          <h2 class="card-title">แดชบอร์ดความหลากหลายทางชีวภาพ</h2>
+          
+          <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">
+            อุทยานแห่งชาติปางสีดา จังหวัดสระแก้ว ได้รับการขนานนามว่าเป็น <strong>"เมืองหลวงผีเสื้อของด่านตะวันออก"</strong> เนื่องจากมีความอุดมสมบูรณ์ของธรรมชาติผืนป่าดงพญาเย็น-เขาใหญ่ พบสายพันธุ์ผีเสื้อมากกว่า 400 ชนิด โดยมีการกระจายตัวตามช่วงเวลาและโป่งเกลือแร่ต่างๆ แผนภูมิด้านล่างแสดงสัดส่วนชนิดที่พบบันทึกตามวงศ์ (Family):
+          </p>
+
+          <!-- SVG simulated bar chart -->
+          <div class="chart-container" id="chartContainer">
+            <!-- Dynamically populated via JS -->
+          </div>
+          <p style="font-size: 0.75rem; color: var(--text-muted); text-align: center; margin-top: 0.5rem;">
+            *คลิกที่แท่งกราฟเพื่อกรองดูข้อมูลตามตระกูลนั้นๆ ในทะเบียนด้านล่าง
+          </p>
+
+          <!-- Interactive Hotspot Map -->
+          <div style="margin-top: 2.5rem; border-top: 1px solid var(--glass-border); padding-top: 2rem;">
+            <h3 class="card-title" style="font-size: 1.25rem;">📍 แผนที่จุดชมผีเสื้อสำคัญ (Butterfly Hotspots)</h3>
+            <p class="card-subtitle">คลิกที่จุดวงกลมเพื่อดูรายละเอียดสถานที่และสายพันธุ์ที่พบหนาแน่น</p>
+            
+            <div class="map-widget">
+              <div class="svg-map-wrapper">
+                <!-- Custom SVG Map -->
+                <svg viewBox="0 0 400 300" id="svgMap">
+                  <!-- Contour topographic lines in background -->
+                  <path d="M 10,150 Q 100,50 200,150 T 390,150" fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="1.5"/>
+                  <path d="M 10,200 Q 120,100 250,200 T 390,200" fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="1.5"/>
+                  <path d="M 10,100 Q 80,20 180,100 T 390,100" fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="1.5"/>
+                  
+                  <!-- River path (Blue) -->
+                  <path d="M -10,280 C 100,280 150,220 200,180 C 230,150 270,160 300,130 C 330,100 350,110 410,50" fill="none" stroke="rgba(33, 150, 243, 0.2)" stroke-width="3" stroke-dasharray="4,4"/>
+                  <text x="310" y="90" fill="rgba(33, 150, 243, 0.4)" font-size="8" font-style="italic">ห้วยน้ำเย็น</text>
+                  
+                  <!-- Main road path (Gold dashed) -->
+                  <path d="M 50,250 L 120,220 L 170,150 L 250,130 L 350,60" fill="none" stroke="rgba(255, 183, 3, 0.2)" stroke-width="4"/>
+                  <path d="M 50,250 L 120,220 L 170,150 L 250,130 L 350,60" fill="none" stroke="var(--accent-gold)" stroke-width="2" stroke-dasharray="5,5"/>
+                  
+                  <!-- Hotspots (interactive nodes) -->
+                  <!-- Node 1: Km 0 -->
+                  <circle cx="50" cy="250" r="10" class="map-node active" data-hotspot="km0" id="node-km0"/>
+                  <!-- Node 2: Waterfall -->
+                  <circle cx="120" cy="220" r="10" class="map-node" data-hotspot="waterfall" id="node-waterfall"/>
+                  <!-- Node 3: Huai Chan Daen -->
+                  <circle cx="170" cy="150" r="10" class="map-node" data-hotspot="huai" id="node-huai"/>
+                  <!-- Node 4: Km 20 Viewpoint -->
+                  <circle cx="350" cy="60" r="10" class="map-node" data-hotspot="km20" id="node-km20"/>
+                  
+                  <!-- Labels -->
+                  <text x="35" y="275" fill="var(--text-secondary)" font-size="9" font-weight="bold">โป่งผีเสื้อ กม. 0</text>
+                  <text x="110" y="200" fill="var(--text-secondary)" font-size="9" font-weight="bold">น้ำตกปางสีดา</text>
+                  <text x="175" y="170" fill="var(--text-secondary)" font-size="9" font-weight="bold">ห้วยชันได</text>
+                  <text x="290" y="50" fill="var(--text-secondary)" font-size="9" font-weight="bold">จุดชมวิว กม. 20</text>
+                </svg>
+              </div>
+              
+              <!-- Hotspot Info Panel -->
+              <div class="hotspot-details-card" id="hotspotDetailsCard">
+                <!-- Dynamically populated via JS -->
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Catalog Species List Section -->
+        <section class="glass-card" id="directoryTab">
+          <h2 class="card-title">คลังทะเบียนผีเสื้ออุทยานฯ</h2>
+          
+          <!-- Filter Controls -->
+          <div class="list-controls">
+            <div class="search-wrapper">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+              </svg>
+              <input type="text" class="search-input" id="searchInput" placeholder="ค้นหาชื่อผีเสื้อ, ชื่อวิทยาศาสตร์, หรือพิกัด..." aria-label="ค้นหาข้อมูลผีเสื้อ">
+            </div>
+            
+            <select class="filter-select" id="familyFilter" aria-label="กรองข้อมูลตามวงศ์ผีเสื้อ">
+              <option value="all">ทั้งหมดทุกตระกูล</option>
+              <!-- Dynamically populated via JS -->
+            </select>
+          </div>
+
+          <!-- Butterfly grid -->
+          <div class="butterfly-grid" id="butterflyGrid">
+            <!-- Dynamically populated via JS -->
+          </div>
+        </section>
+        
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <p>© 2026 Pang Sida National Park Butterfly Database System. พัฒนาขึ้นโดยความร่วมมือของศูนย์วิทยาศาสตร์อนุรักษ์</p>
+    <p style="margin-top:0.5rem; color: var(--text-muted); font-size: 0.75rem;">ข้อมูลสถิติและการจำแนกใช้เพื่อวิเคราะห์เบื้องต้นในสนามเท่านั้น</p>
+  </footer>
+
+  <!-- MODALS -->
+
+  <!-- 1. Species Details Modal -->
+  <div class="modal-overlay" id="detailsModal">
+    <div class="modal-content">
+      <button class="modal-close" aria-label="ปิดกล่องข้อมูล" id="closeDetailsModalBtn">&times;</button>
+      <div class="modal-header-img"></div>
+      <div class="modal-body">
+        <div class="modal-body-content">
+          <!-- Dynamically populated via JS -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. Log New Discovery Modal (Form to submit to Google Sheet) -->
+  <div class="modal-overlay" id="discoveryModal">
+    <div class="modal-content" style="max-width: 500px;">
+      <button class="modal-close" aria-label="ปิดฟอร์ม" id="closeDiscoveryModalBtn">&times;</button>
+      <div class="modal-body">
+        <h3 style="font-family: var(--font-serif); font-size: 1.5rem; margin-bottom: 1rem; color: var(--accent-gold);">📝 รายงานสายพันธุ์ใหม่ / บันทึกการค้นพบ</h3>
+        <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1.5rem;">
+          กรอกรายละเอียดการค้นพบเพื่อนำส่งเข้าสู่คลังฐานข้อมูล Google Sheet ของอุทยานฯ
+        </p>
+
+        <!-- Preview inside form -->
+        <div id="formImagePreview" style="margin-bottom: 1.25rem;"></div>
+
+        <form id="discoveryForm">
+          <div class="form-group">
+            <label for="discCommonName">ชื่อผีเสื้อที่พบ (Common Name/Thai)</label>
+            <input type="text" id="discCommonName" class="form-control" placeholder="เช่น ผีเสื้อด่างพรานธรรมดา" required>
+          </div>
+          
+          <div class="form-group">
+            <label for="discSciName">ชื่อวิทยาศาสตร์ (Scientific Name) - *ถ้าทราบ*</label>
+            <input type="text" id="discSciName" class="form-control" placeholder="เช่น Athyma perius">
+          </div>
+
+          <div class="form-group">
+            <label for="discFamily">วงศ์ (Family)</label>
+            <select id="discFamily" class="form-control">
+              <option value="Papilionidae">Papilionidae (ผีเสื้อหางติ่ง)</option>
+              <option value="Nymphalidae">Nymphalidae (ผีเสื้อขาหน้าพู่)</option>
+              <option value="Pieridae">Pieridae (ผีเสื้อหนอนใบรัก/ขาวจำปา)</option>
+              <option value="Lycaenidae">Lycaenidae (ผีเสื้อสีน้ำเงิน)</option>
+              <option value="Hesperiidae">Hesperiidae (ผีเสื้อบินเร็ว)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="discReporter">ชื่อผู้พบ / ผู้รายงาน</label>
+            <input type="text" id="discReporter" class="form-control" placeholder="ชื่อ-นามสกุลของคุณ" required>
+          </div>
+
+          <div class="form-group">
+            <label for="discNotes">รายละเอียดพิกัดจุดที่พบ / บันทึกเพิ่มเติม</label>
+            <textarea id="discNotes" class="form-control" placeholder="เช่น พบที่โป่งดินกิโลเมตรที่ 5 เมื่อเวลา 10:30 น." required></textarea>
+          </div>
+
+          <button type="submit" class="submit-btn" id="submitDiscoveryBtn">ส่งข้อมูลบันทึกสำเร็จ</button>
+          
+          <!-- Save Status Bar -->
+          <div class="form-status" id="formStatus"></div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. Connection Settings Modal -->
+  <div class="modal-overlay" id="settingsModal">
+    <div class="modal-content" style="max-width: 560px;">
+      <button class="modal-close" aria-label="ปิดหน้าต่างตั้งค่า" id="closeSettingsModalBtn">&times;</button>
+      <div class="modal-body">
+        <h3 style="font-family: var(--font-serif); font-size: 1.5rem; margin-bottom: 1rem; color: var(--text-primary);">⚙️ ตั้งค่าการเชื่อมต่อระบบ</h3>
+
+        <form id="settingsForm">
+          <!-- AI Classifier API endpoint -->
+          <div class="form-group" style="margin-bottom:1.4rem; padding-bottom:1.4rem; border-bottom:1px solid rgba(255,255,255,0.08);">
+            <label for="aiApiUrl" style="font-weight:700; color: var(--accent-green);">🤖 Pang Sida AI Classifier — Endpoint URL</label>
+            <p style="font-size:0.78rem; color: var(--text-secondary); margin: 0.3rem 0 0.6rem; line-height:1.5;">
+              URL ของ butterfly_server (EfficientNet-B0 v3, 40 species, ~82% accuracy). Default: tunnel public URL หรือ <code>http://localhost:8777</code> สำหรับเทสในเครื่อง
+            </p>
+            <input type="url" id="aiApiUrl" class="form-control"
+                   placeholder="https://xxx.trycloudflare.com หรือ http://localhost:8777"
+                   value="https://steady-follow-nail-suzuki.trycloudflare.com">
+            <button type="button" class="btn-secondary" onclick="testAIConnection()"
+                    style="margin-top:0.6rem; padding:0.5rem 1rem; font-size:0.85rem;">
+              ทดสอบการเชื่อมต่อ
+            </button>
+            <span id="aiTestStatus" style="margin-left:0.6rem; font-size:0.85rem;"></span>
+          </div>
+
+          <!-- Google Sheets endpoint -->
+          <div class="form-group">
+            <label for="sheetsUrl" style="font-weight:700; color: var(--accent-gold);">📊 Google Sheets Web App Deployment URL</label>
+            <p style="font-size:0.78rem; color: var(--text-secondary); margin: 0.3rem 0 0.6rem; line-height:1.5;">
+              ลิงก์ที่ได้จาก Apps Script เมื่อ Deploy เป็น Web App (ดู <a href="file:///g:/My Drive/WebPageButterfly/google_sheet_script.js" target="_blank" style="color: var(--accent-gold);">google_sheet_script.js</a>)
+            </p>
+            <input type="url" id="sheetsUrl" class="form-control" placeholder="https://script.google.com/macros/s/.../exec">
+          </div>
+
+          <button type="submit" class="submit-btn" style="background: linear-gradient(135deg, var(--accent-green) 0%, #00e676 100%); color:#000;" id="saveSettingsBtn">บันทึกการตั้งค่า</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Javascript Logic -->
+  <script src="app.js"></script>
+</body>
+</html>
