@@ -1129,3 +1129,273 @@ footer {
   border-color: var(--accent-green);
   color: var(--accent-green);
 }
+
+/* ──────────────────────────────────────────────────────────
+   MOBILE & UX IMPROVEMENTS (Added for PWA Park Ranger Mobile UX)
+   ────────────────────────────────────────────────────────── */
+
+@media (max-width: 1024px) {
+  /* Prevent JS inline styles from forcing 2-column layout on mobile/tablet */
+  .main-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media (max-width: 768px) {
+  /* Dashboard layout margins and paddings */
+  .dashboard-container {
+    margin: 1rem auto;
+    padding: 0 1rem;
+    gap: 1.5rem;
+  }
+  
+  /* Compact & beautiful header on mobile */
+  header {
+    padding: 0.85rem 1rem;
+  }
+  
+  .logo-container {
+    gap: 0.5rem;
+  }
+  
+  .logo-container img {
+    width: 34px !important;
+    height: 34px !important;
+  }
+  
+  .logo-text h1 {
+    font-size: 1.15rem;
+  }
+  
+  .logo-text p {
+    display: none; /* Hide subtitle to preserve space */
+  }
+  
+  /* Turn desktop navigation into a native-like bottom tab bar */
+  .nav-links {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(8, 12, 16, 0.95);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-top: 1px solid var(--glass-border);
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 0.5rem 0.25rem;
+    padding-bottom: calc(0.5rem + env(safe-area-inset-bottom, 0px));
+    gap: 0.25rem;
+    z-index: 999;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.5);
+  }
+  
+  /* Nav button styling in the bottom tab bar */
+  .nav-btn {
+    flex: 1;
+    justify-content: center;
+    flex-direction: column;
+    gap: 2px;
+    font-size: 0.75rem;
+    padding: 0.4rem 0.25rem;
+    min-height: 48px; /* Touch target >= 44px */
+    border: none;
+    background: transparent;
+    border-radius: var(--border-radius-md);
+  }
+  
+  .nav-btn.active {
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--accent-green);
+    border-color: transparent;
+  }
+  
+  /* Ensure page content isn't covered by bottom tab bar */
+  body {
+    padding-bottom: 80px;
+  }
+  
+  /* Settings trigger button size check */
+  .settings-trigger {
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 576px) {
+  /* 2x2 grid for Overview Stats to prevent long vertical stack */
+  .overview-stats {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+  
+  .stat-card {
+    padding: 1rem;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+    min-height: 105px;
+  }
+  
+  .stat-info h3 {
+    font-size: 0.72rem;
+    letter-spacing: 0.5px;
+  }
+  
+  .stat-value {
+    font-size: 1.5rem;
+  }
+  
+  .stat-desc {
+    font-size: 0.65rem;
+  }
+  
+  /* Reposition and scale down the card icons */
+  .stat-icon-wrapper {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    width: 32px;
+    height: 32px;
+    font-size: 1rem;
+  }
+  
+  /* Avoid clipping for system status indicators in the 4th stat card */
+  .stat-card:nth-child(4) .stat-info {
+    width: 100%;
+  }
+  
+  .stat-card:nth-child(4) .stat-info div span {
+    font-size: 0.72rem !important;
+  }
+  
+  /* List controls stacking */
+  .list-controls {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  .search-wrapper, .filter-select {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+  
+  /* Modal overlays and content styling */
+  .modal-overlay {
+    padding: 0.75rem;
+  }
+  
+  .modal-content {
+    max-height: 95vh;
+    width: 100% !important;
+  }
+  
+  .modal-body {
+    padding: 1.25rem 1rem;
+  }
+  
+  /* Modal details content sizing */
+  .modal-header-img {
+    height: 180px;
+  }
+  
+  .modal-close {
+    width: 44px;
+    height: 44px;
+    top: 0.5rem;
+    right: 0.5rem;
+    font-size: 1.5rem;
+  }
+  
+  .modal-title-sec h3 {
+    font-size: 1.4rem;
+  }
+  
+  .modal-meta-grid {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+    padding: 0.75rem;
+  }
+  
+  /* Dropzone responsive size */
+  .dropzone-container {
+    min-height: 180px;
+    padding: 1.5rem 1rem;
+  }
+  
+  .dropzone-icon {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  .dropzone-container h3 {
+    font-size: 0.95rem;
+  }
+  
+  .dropzone-container p {
+    font-size: 0.75rem;
+  }
+  
+  /* Gallery thumbnails horizontal scroll list */
+  #dropzone > div > div[style*="display:flex"] {
+    display: flex !important;
+    gap: 6px !important;
+    overflow-x: auto !important;
+    flex-wrap: nowrap !important;
+    padding-bottom: 8px !important;
+    width: 100% !important;
+    justify-content: flex-start !important;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  #dropzone img {
+    width: 58px !important;
+    height: 58px !important;
+  }
+  
+  #dropzone [onclick^="removeScanImage"] {
+    width: 58px !important;
+    height: 58px !important;
+  }
+  
+  #dropzone [onclick^="removeScanImage"] span {
+    width: 18px !important;
+    height: 18px !important;
+    font-size: 10px !important;
+    top: -4px !important;
+    right: -4px !important;
+  }
+  
+  /* Map hotspot nodes larger tap area */
+  .map-node {
+    r: 12px !important;
+    stroke-width: 10 !important;
+  }
+  
+  /* Map hotspots list badge larger target area */
+  .hotspot-species-badge {
+    padding: 0.35rem 0.7rem !important;
+    font-size: 0.8rem !important;
+    min-height: 36px;
+    display: inline-flex;
+    align-items: center;
+  }
+  
+  /* Form field styles */
+  .btn-secondary {
+    min-height: 44px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+  
+  #aiTestStatus {
+    display: block !important;
+    margin-left: 0 !important;
+    margin-top: 0.5rem !important;
+  }
+}
