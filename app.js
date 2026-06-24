@@ -155,12 +155,13 @@ async function startAIScan() {
 }
 function resetScanner() { activeScanFiles=[]; activeScanDataUris=[]; renderScanGallery(); document.getElementById("scanResults").style.display="none"; }
 
-// ── Sheets / AI Status ──
+// ── API / AI Status ──
 function checkSheetsConnectionStatus() {
-  const u=localStorage.getItem("pang_sida_sheets_url"), i=document.getElementById("sheetsStatusIndicator"), t=document.getElementById("sheetsStatusText");
+  const i=document.getElementById("sheetsStatusIndicator"), t=document.getElementById("sheetsStatusText");
   if(!i||!t) return;
-  if(u) { i.className="status-dot active"; t.textContent="Sheets: เชื่อมต่อแล้ว"; t.style.color="var(--accent-green)"; }
-  else { i.className="status-dot"; t.textContent="Sheets: ออฟไลน์"; t.style.color="var(--text-secondary)"; }
+  fetch(`${getAIBaseUrl()}/api/stats/summary`,{signal:AbortSignal.timeout(5000)})
+    .then(r=>{ if(r.ok){ i.className="status-dot active"; t.textContent="DB: ออนไลน์"; t.style.color="var(--accent-green)" } else throw new Error() })
+    .catch(()=>{ i.className="status-dot"; t.textContent="DB: ออฟไลน์"; t.style.color="var(--text-secondary)" });
 }
 async function checkAIConnectionStatus() {
   const i=document.getElementById("aiStatusIndicator"), t=document.getElementById("aiStatusText");
@@ -194,8 +195,13 @@ function openNewDiscoveryModal() { document.getElementById("discoveryModal").cla
   const fp=document.getElementById("formPreview"); if(fp&&activeScanDataUris.length) fp.innerHTML=`<img src="${activeScanDataUris[0]}" style="width:100%;max-height:150px;object-fit:contain;border-radius:8px;">`; }
 async function handleDiscoverySubmit(e) {
   e.preventDefault(); const sd=document.getElementById("formStatus"); sd.style.display="block"; sd.className="form-status loading"; sd.innerHTML="กำลังนำส่ง…";
-  const d={commonName:document.getElementById("discCommonName").value.trim(),scientificName:document.getElementById("discSciName").value.trim(),family:document.getElementById("discFamily").value,reporter:document.getElementById("discReporter").value.trim()||"Anonymous Ranger",notes:document.getElementById("discNotes").value.trim(),timestamp:new Date().toISOString()};
-  try { const u=localStorage.getItem("pang_sida_sheets_url"); if(u) await fetch(u,{method:"POST",mode:"no-cors",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"new_discovery",...d})});
+  const d={commonName:document.getElementById("discCommonName").value.trim(),scientificName:document.getElementById("discSciName").value.trim(),family:document.getElementById("discFamily").value,reporter:document.getElementById("discReporter").value.trim()||"Anonymous",notes:document.getElementById("discNotes").value.trim(),timestamp:new Date().toISOString()};
+  try { const base=getAIBaseUrl(); const fd=new FormData();
+    fd.append("species_id","new_discovery"); fd.append("name_th",d.commonName||"ชนิดใหม่");
+    fd.append("name_sci",d.scientificName||"Sida sp."); fd.append("family",d.family||"Unknown");
+    fd.append("reporter",d.reporter); fd.append("notes",d.notes);
+    const r=await fetch(`${base}/api/field-observation`,{method:"POST",body:fd});
+    if(!r.ok) throw new Error(`HTTP ${r.status}`);
     db.push({id:"disc_"+Date.now(),commonName:d.commonName||"New Species",thaiName:d.commonName||"ชนิดใหม่",scientificName:d.scientificName||"Sida sp.",family:d.family,description:"รายงานการค้นพบใหม่",image:activeScanDataUris[0]||"",discoveryDate:new Date().toISOString().split("T")[0],confidence:"N/A (Discovery)",reporter:d.reporter,notes:d.notes});
     saveLocalDatabase(); renderSpeciesGrid(); renderChart(); updateCounters(); sd.className="form-status success"; sd.innerHTML="✅ บันทึกสำเร็จ!";
     setTimeout(()=>{ closeAllModals(); resetScanner(); },1500); } catch(err) { sd.className="form-status error"; sd.innerHTML=`❌ ${err.message}`; }
